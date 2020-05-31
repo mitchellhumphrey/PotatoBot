@@ -3,19 +3,40 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'REACTION'] });
 const config = require('./config.json'); //stores login token as token property
 const fs = require('fs');
 const Database = require('better-sqlite3');
-
 const prefix = config.prefix;
+
+
+/*
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////TODO////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///Think ways of making commands shorter / maybe using pipe to seperate
+///args instead of spaces
+///Get custom commands working
+///
+///
+///
+///
+///
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+*/
+
+
+
 
 //my files
 const start = require('./functions/on_start.js');
 const help = require('./functions/help.js');
-const database = require('./functions/database.js');
+const permissions = require('./functions/permissions.js');
 const test = require('./functions/test.js');
 const developer = require('./functions/developer.js');
 const voice = require('./functions/voice.js');
 const reactions = require('./functions/reactions.js');
 const join = require('./functions/join.js');
 const leave = require('./functions/leave.js');
+const playlist = require('./functions/playlist.js');
 
 let db = new Database('databases/foobar.db')
 
@@ -52,7 +73,10 @@ client.on('message', async function (msg) {
   //DEVELOPER COMMANDS
 
   else if (command === "bot-status-sensitive" && developer.developer_check(msg)) {
-    developer.list_active_servers(msg, client, db, voice.get_queues());
+    developer.bot_status_sensitive(msg, client, db, voice.get_queues());
+  }
+  else if (command === "test-playlist") {
+    playlist.test_playlist(msg, client, db);
   }
 
 
@@ -61,27 +85,44 @@ client.on('message', async function (msg) {
   else if (command === "bot-status") {
     developer.bot_status(msg, client, db, voice.get_queues());
   }
-  else if (command === "add" && database.check_if_valid_author(msg, db)) {
+  else if (command === "server-status") {
+    developer.server_status(msg, client, db, voice.get_queues());
+  }
+
+  else if (command === "make-playlist") {
+    playlist.make_playlist(msg, client, db, args);
+  }
+  else if (command === "play-playlist-order") {
+    playlist.play_playlist(msg, client, db, args);
+  }
+  else if (command === 'play-playlist') {
+    playlist.play_playlist_random(msg, client, db, args);
+  }
+  else if (command === "add-to-playlist"){
+    playlist.add_to_playlist(msg,client,db,args);
+  }
+
+  else if (command === "add" && permissions.check_if_valid_author(msg, db)) {
     console.log("IN ADD");
-    database.add(msg, args, db);
+    permissions.add(msg, args, db);
   }
   else if (command === 'args-test') {
     test.args_test(msg, args);
   }
   else if (command === 'list-custom-commands') {
-    database.listall(msg, db);
+    permissions.listall(msg, db);
   }
-  else if (command === 'remove' && database.check_if_valid_author(msg, db)) {
-    database.remove(msg, args, db);
+  else if (command === 'remove' && permissions.check_if_valid_author(msg, db)) {
+    permissions.remove(msg, args, db);
   }
-  else if (command === 'add-perms' && database.check_if_valid_author(msg, db)) {
-    database.add_user(msg, args, db);
+  else if (command === 'add-perms' && permissions.check_if_valid_author(msg, db)) {
+    permissions.add_user(msg, args, db);
   }
-  else if (command === 'remove-perms' && database.check_if_valid_author(msg, db)) {
-    database.remove_user(msg, db);
+  else if (command === 'remove-perms' && permissions.check_if_valid_author(msg, db)) {
+    permissions.remove_user(msg, db);
   }
   else if (command === 'list-perms') {
-    database.list_perms(msg, db);
+    permissions.list_perms(msg, db);
   }
   else if (command === 'join-vc') {
     voice.join_vc(msg, client);
@@ -91,12 +132,6 @@ client.on('message', async function (msg) {
   }
   else if (command === 'add-song') {
     voice.add_song(msg, client, args, db);
-  }
-  else if (command === 'play-test') {
-    voice.play_test(msg, client);
-  }
-  else if (command === 'play-test-2') {
-    voice.play_test2(msg, client);
   }
   else if (command === 'play') {
     voice.play(msg, client, args, db);
@@ -124,7 +159,7 @@ client.on('message', async function (msg) {
   }
   //custom command parsing
   else {
-    database.custom(msg, command, db);
+    permissions.custom(msg, command, db);
   }
 });
 

@@ -3,16 +3,23 @@ const fs = require('fs');
 const https = require('https');
 const Database = require('better-sqlite3');
 const ytdl = require('ytdl-core');
+
 /*
-TODO
- ADD SKIP FUNCTIONALITY WHEN QUEUE IS EMPTY //
- ADD EMBEDS FOR ALL SITUATIONS
- make playlists possible
- add song name to list queue
-
-
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////TODO////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///Add Embeds for all situations
+///Update help file
+///
+///
+///
+///
+///ADD SKIP FUNCTIONALITY WHEN QUEUE IS EMPTY // done but making make more clean later?
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 */
-server_queue = { playing_state : new Object() }
+server_queue = { playing_state: new Object() }
 
 
 function create_server_queues(old_queue, client) {
@@ -37,6 +44,8 @@ function is_in_database_as_song_name(db, guild_id, name) {
     return Boolean(db.prepare(`SELECT name FROM '${guild_id}_music' WHERE name='${name}';`).get())
 }
 
+
+//SEE WHAT HAPPENS WHEN CONNECTION LOST AND FINISH ISNT CALLED
 function download(url, dest, cb) {
     var file = fs.createWriteStream(dest);
     var request = https.get(url, function (response) {
@@ -75,9 +84,9 @@ function recursive_play(msg, queue, client, connection) {
 
 function start_play(msg, queue, client) {
     console.log("IN START PLAY")
-    
+
     if (msg.member.voice.channel.join !== null) {
-        
+
         msg.member.voice.channel.join().then(connection => {
             queue.playing_state[msg.guild.id] = true;
             recursive_play(msg, queue, client, connection);
@@ -116,9 +125,9 @@ module.exports = {
 
 
                 download(msg.attachments.first().url, `./music/${msg.id}.mp3`, () => {
-
+                    //SANITIZE
                     db.prepare(`INSERT INTO '${msg.guild.id}_music' VALUES('${args[0]}','./music/${msg.id}.mp3')`).run();
-                    msg.channel.send(new Discord.MessageEmbed().setColor('#0000FF').setTitle("Added Song: " + args[0].toString()).addField("Added By:",msg.author.toString()));
+                    msg.channel.send(new Discord.MessageEmbed().setColor('#0000FF').setTitle("Added Song: " + args[0].toString()).addField("Added By:", msg.author.toString()));
                     msg.delete();
                 })
 
@@ -142,14 +151,15 @@ module.exports = {
                 .then(() => {
                     console.log("DOWNLOADED SUCESSFULLY")
                     db.prepare(`INSERT INTO '${msg.guild.id}_music' VALUES('${args[0]}','./music/${msg.id}.mp3')`).run();
-                    msg.channel.send(new Discord.MessageEmbed().setColor('#0000FF').setTitle("Added Song: " + args[0].toString()).addField("Added By:",msg.author.toString()));
+                    msg.channel.send(new Discord.MessageEmbed().setColor('#0000FF').setTitle("Added Song: " + args[0].toString()).addField("Added By:", msg.author.toString()));
                     msg.delete();
                 }).catch(err => {
                     msg.channel.send(new Discord.MessageEmbed().setColor('#0000FF').setTitle("Unable To Add Song"));
                     msg.delete();
-                    fs.unlink(`./music/${msg.id}.mp3`, err => {
-                        if (err) {
-                            console.error(err)
+                    console.error(err);
+                    fs.unlink(`./music/${msg.id}.mp3`, err2 => {
+                        if (err2) {
+                            console.error(err2)
                             return
                         }
                     });
@@ -159,38 +169,10 @@ module.exports = {
 
     },
 
-    play_test: function (msg, client) {
-        if (msg.member.voice) {
-            msg.member.voice.channel.join().then(connection => {
-                var stream = connection.play('./music/test.mp3');
-                stream.on("speaking", value => {
-                    if (!value) {
-                        connection.disconnect();
-                        return;
-                    }
-                });
-            });
-        }
-    },
-
-    play_test2: function (msg, client) {
-        if (msg.member.voice) {
-            msg.member.voice.channel.join().then(connection => {
-                var stream = connection.play('./music/test.mp3');
-                stream.on("finish", value => {
-                    var stream = connection.play('./music/test.mp3');
-                    stream.on("finish", value => {
-                        connection.disconnect();
-                        return;
-                    })
-                });
-            });
-        }
-    },
-
     play: async function (msg, client, args, db) {
         server_queue = create_server_queues(server_queue, client);
         if (is_in_database_as_song_name(db, msg.guild.id, args[0])) {
+            //SANITIZE
             var returned_value = db.prepare(`SELECT path FROM '${msg.guild.id}_music' WHERE name='${args[0]}';`).get();
             console.log("returned_value is ")
             console.log(returned_value)
@@ -199,16 +181,13 @@ module.exports = {
             if (msg.member.voice) {
                 console.log(server_queue.playing_state[msg.guild.id] + " IS PLAYING STATE")
 
-                server_queue[msg.guild.id].push({path : path,name : args[0]});
+                server_queue[msg.guild.id].push({ path: path, name: args[0] });
 
 
 
                 if (server_queue.playing_state[msg.guild.id] === false) {
                     console.log("PLAYING STATE IS FALSE")
-
-                    console.log()
-
-                    msg.channel.send(new Discord.MessageEmbed().setColor('#00FF00').setTitle("Now Playing: " + args[0].toString()).addField("Added By:",msg.author.toString()));
+                    msg.channel.send(new Discord.MessageEmbed().setColor('#00FF00').setTitle("Now Playing: " + args[0].toString()).addField("Added By:", msg.author.toString()));
                     msg.delete();
                     console.log("CALLING START PLAY")
                     start_play(msg, server_queue, client);
@@ -219,8 +198,39 @@ module.exports = {
                 else if (server_queue.playing_state[msg.guild.id] === true) {
                     console.log("PLAYING STATE IS TRUE")
 
-                    msg.channel.send(new Discord.MessageEmbed().setColor('#00FF00').setTitle("Added to Queue: " + args[0].toString()).addField("Added By:",msg.author.toString()));
+                    msg.channel.send(new Discord.MessageEmbed().setColor('#00FF00').setTitle("Added to Queue: " + args[0].toString()).addField("Added By:", msg.author.toString()));
                     msg.delete();
+                }
+            }
+
+        }
+
+    },
+    play_no_messages: async function (msg, client, song_name, db) {
+        server_queue = create_server_queues(server_queue, client);
+        if (is_in_database_as_song_name(db, msg.guild.id, song_name)) {
+            //SANITIZE
+            var returned_value = db.prepare(`SELECT path FROM '${msg.guild.id}_music' WHERE name='${song_name}';`).get();
+            console.log("returned_value is ")
+            console.log(returned_value)
+            var path = returned_value.path;
+            console.log(path + " IS PATH TO NEW SONG");
+            if (msg.member.voice) {
+                console.log(server_queue.playing_state[msg.guild.id] + " IS PLAYING STATE")
+
+                server_queue[msg.guild.id].push({ path: path, name: song_name });
+
+
+
+                if (server_queue.playing_state[msg.guild.id] === false) {
+                    start_play(msg, server_queue, client);
+                    server_queue.playing_state[msg.guild.id] = true;
+                }
+
+
+
+                else if (server_queue.playing_state[msg.guild.id] === true) {
+                    console.log("PLAYING STATE IS TRUE")
                 }
             }
 
@@ -230,9 +240,10 @@ module.exports = {
 
     remove_song: function (msg, client, args, db) {
         if (is_in_database_as_song_name(db, msg.guild.id, args[0])) {
+            //SANITIZE
             var path = db.prepare(`SELECT path FROM '${msg.guild.id}_music' WHERE name='${args[0]}';`).get().path;
             db.prepare(`DELETE FROM '${msg.guild.id}_music' WHERE name='${args[0]}';`).run();
-            msg.channel.send(new Discord.MessageEmbed().setColor('#FF0000').setTitle("Removed: " + args[0].toString()).addField("Added By:",msg.author.toString()));
+            msg.channel.send(new Discord.MessageEmbed().setColor('#FF0000').setTitle("Removed: " + args[0].toString()).addField("Added By:", msg.author.toString()));
             msg.delete();
             fs.unlink(path, err => {
                 if (err) {
@@ -258,7 +269,7 @@ module.exports = {
 
 
     skip: function (msg, client) {
-        if(msg.member.voice.channel !== null){
+        if (msg.member.voice.channel !== null) {
             if (server_queue[msg.guild.id].length !== 0) {
                 start_play(msg, server_queue, client);
             }
@@ -271,20 +282,28 @@ module.exports = {
             msg.channel.send(new Discord.MessageEmbed().setTitle("Not in Voice Channel"))
             msg.delete();
         }
-        
+
 
     },
 
-    queue : (msg, client) =>{
+    queue: (msg, client) => {
         addedEmbed = new Discord.MessageEmbed().setTitle("Queue");
         server_queue = create_server_queues(server_queue, client);
-        server_queue[msg.guild.id].forEach(x=>{
-            addedEmbed.addField("Song Name",x.name);
+        server_queue[msg.guild.id].forEach(x => {
+            addedEmbed.addField("Song Name", x.name);
         })
         msg.channel.send(addedEmbed);
     },
 
-    get_queues : () =>{
+    get_queues: () => {
         return server_queue;
+    },
+
+    in_database: function (msg, name_of_song, db) {
+        return is_in_database_as_song_name(db, msg.guild.id, name_of_song);
+    },
+
+    get_path: function (msg, name_of_song, db) {
+        return db.prepare(`SELECT path FROM '${msg.guild.id}_music'`).get().path;
     }
 }
