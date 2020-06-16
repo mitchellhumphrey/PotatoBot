@@ -34,7 +34,7 @@ module.exports = {
     },
     meme: async function (msg, term) {
         nodeyourmeme.search(term).then((result) => {
-            msg.channel.send(new Discord.MessageEmbed().setTitle(result.name).setDescription(result.about.slice(0, 2000)).addField("URL",`[Click Here](https://knowyourmeme.com/search?q=${result.name.replace(/ /g,"+")})`));
+            msg.channel.send(new Discord.MessageEmbed().setTitle(result.name).setDescription(result.about.slice(0, 2000)).addField("URL",`[Click Here](https://knowyourmeme.com/search?q=${result.name.replace(/ /g,"+")})`).setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/KnowYourMeme.png/180px-KnowYourMeme.png'));
             
         })
             .catch((err) => {

@@ -26,7 +26,7 @@ helpEmbed.setDescription(title)
 helpEmbed.addField("**"+config.prefix+"help**","gives help information");
 helpEmbed.addField("**"+config.prefix+"bot-status**", "gives bot status");
 helpEmbed.addField("**"+config.prefix+"server-status**", "gives status of server");
-helpEmbed.addField("**"+config.prefix+"kill**","terminates bot");
+//helpEmbed.addField("**"+config.prefix+"kill**","terminates bot");
 helpEmbed.addField("**"+config.prefix+"hlep**","sends a funny message");
 helpEmbed.addField(`**${config.prefix}search <term>**`,"searches Wikipedia for an article and gives the summary and link");
 helpEmbed.addField(`**${config.prefix}meme <term>**`,"searches Knowyourmeme for an article and gives the summary and link");
