@@ -6,8 +6,8 @@ const Database = require('better-sqlite3');
 ///////////////////////////////////TODO////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///Get working lol xd
-///
-///
+///Add option to set role on join
+///Add certain emote to give for role
 ///
 ///
 ///
@@ -22,6 +22,9 @@ function is_in_database_as_message_watch(db, guild_id, id) {
 }
 
 module.exports = {
+    //pre         :
+    //post        :
+    //description :
     messageReactionAdd: async function (reaction, user, db) {
         if (reaction.partial) {
             // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -44,6 +47,9 @@ module.exports = {
             reaction.message.guild.roles.fetch(role.role_given.substring(3, 21)).then(x => guild_member.roles.add(x))
         }
     },
+    //pre         :
+    //post        :
+    //description :
     messageReactionRemove: async function (reaction, user, db) {
         if (reaction.partial) {
             // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -67,53 +73,82 @@ module.exports = {
         }
 
     },
-
+    //pre         :
+    //post        :
+    //description :
     add_message_to_watch: function (msg, args, db) {
         //args[0] is message ID to watch, args[1] is the role to be given
         console.log("IN add_message_to_watch")
         if (!is_in_database_as_message_watch(db, msg.guild.id, args[0])) {
             console.log("message is not in database");
-            //SANITIZE SOMEHOW
-            db.prepare(`INSERT INTO '${msg.guild.id}_reaction_roles' VALUES('${args[0]}','${args[1]}')`).run();
+            try {
+                //SANITIZE SOMEHOW
+                db.prepare(`INSERT INTO '${msg.guild.id}_reaction_roles' VALUES('${args[0]}','${args[1]}')`).run();
+                msg.react("✅")
+            }
+            catch (err) {
+                console.log(error);
+                msg.react("❌")
+            }
+
 
         }
     },
-
+    //pre         :
+    //post        :
+    //description :
     remove_message_from_watch: function (msg, args, db) {
         //args[0] is message ID to remove from watch
         console.log("IN remove_message_from_watch")
         if (is_in_database_as_message_watch(db, msg.guild.id, args[0])) {
-            console.log("message is in database");
-            db.prepare(`DELETE FROM '${msg.guild.id}_reaction_roles' WHERE message_id_to_watch='${args[0]}';`).run();
-            console.log("removed Message")
+            try {
+                console.log("message is in database");
+                db.prepare(`DELETE FROM '${msg.guild.id}_reaction_roles' WHERE message_id_to_watch='${args[0]}';`).run();
+                console.log("removed Message")
+                msg.react("✅")
+            }
+            catch(err){
+                console.log(err);
+                msg.react("❌")
+            }
+            
         }
     },
-
+    //pre         :
+    //post        :
+    //description :
     list_watch: function (msg, args, db, client) {
         console.log("Listing messages to watch");
         messages_watching = "I'm Watching These Messages: \n"
-        db.prepare(`SELECT * FROM '${msg.guild.id}_reaction_roles'`).all().forEach(x => {
-            console.log(x.message_id_to_watch);
-            messages_watching += (x.message_id_to_watch + '\n')
+        var embed = new Discord.MessageEmbed();
+        var bar = new Promise((res, rej) => {
+            db.prepare(`SELECT * FROM '${msg.guild.id}_reaction_roles'`).all().forEach(x => {
 
+                var theChannel;
 
-            /*msg.guild.channels.cache.forEach(tempChannel =>{
-                console.log(tempChannel.permissionOverwrites)
-                console.log("HIGHEST ROLE FOR BOT'S ID IS "+client.member.highestRole.id.toString())
-                if(tempChannel.type === 'text' && tempChannel.permissionOverwrites.allow.FLAGS["VIEW_CHANNEL"]===true){
-                    console.log(tempChannel.messages.cache);
-                    tempChannel.messages.cache.each(message=>{
-                        console.log(message.content)
-                    })
-                    
-                    
-                    
-                    
-                    console.log(message.content).catch(console.error)
+                for (const [, channel] of msg.guild.channels.cache) {
+                    if (channel.type === 'text') {
+                        channel.messages.fetch(x.message_id_to_watch).then(async (idk) => {
+                            if (idk.id === x.message_id_to_watch) {
+
+                                channel.messages.fetch(x.message_id_to_watch)
+                                    .then(watched => {
+                                        //messages_watching += (`[${idk.content}](${watched.url}) Role: ${x.role_given} ID: ${x.message_id_to_watch}\n\n\n`);
+                                        embed.addField("Message Info:", `[${idk.content}](${watched.url})\nRole: ${x.role_given}\nID: ${x.message_id_to_watch}`)
+                                        console.log(messages_watching);
+                                        res();
+                                    })
+                            }
+                        }).catch((err) => { /*console.log(err)*/ })
+                    }
                 }
-            })*/
-            //x.message_id_to_watch
-        });
-        msg.channel.send(messages_watching)
+            })
+        }).then(() => {
+            console.log("Should be sending")
+            embed.setTitle("Watching").setDescription(messages_watching);
+            msg.channel.send(embed)
+        }).catch(err => {
+            console.log(err);
+        })
     }
 }

@@ -48,20 +48,20 @@ module.exports = {
             if(x.id === msg.guild.ownerID) {
                 console.log("IS SERVER OWNER"); 
                 msg.channel.send(new Discord.MessageEmbed().setTitle("Tried to Give Server Owner Perms"));
-                msg.delete();
+                //msg.delete();
                 flag = true;
 
             }
             else if (x.bot){
                 console.log("IS A BOT");
                 msg.channel.send(new Discord.MessageEmbed().setTitle("Tried to Give Bot Perms"));
-                msg.delete();
+                //msg.delete();
                 flag=true;
             }
             else if(config.developers.includes(x.id.toString())) {
                 console.log("IS A BOT DEVELOPER"); 
                 msg.channel.send(new Discord.MessageEmbed().setTitle("Tried to Give Bot Developer Perms"));
-                msg.delete();
+                //msg.delete();
                 flag=true;
             }
             //x.id
@@ -77,11 +77,11 @@ module.exports = {
         
         if(bool) {
             msg.channel.send(addedEmbed);
-            msg.delete();
+            //msg.delete();
         }
         else if(!flag) {
             msg.channel.send(new Discord.MessageEmbed().setTitle("No New Users to Give Perms"))
-            msg.delete();
+            //msg.delete();
         }
 
     },
@@ -125,8 +125,10 @@ module.exports = {
             addedEmbed.addField("Has Perms", textOfPerms);
         }
         
-
-        addedEmbed.addField("Bot Developer", "<@148812749260980224>")
+        config.developers.forEach(x=>{
+            addedEmbed.addField("Bot Developer", "<@"+x+">")
+        })
+        //addedEmbed.addField("Bot Developer", "<@148812749260980224>")
         msg.channel.send(addedEmbed);
     }
 

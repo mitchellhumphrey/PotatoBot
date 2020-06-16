@@ -4,14 +4,14 @@ const config = require('./config.json'); //stores login token as token property
 const fs = require('fs');
 const Database = require('better-sqlite3');
 const prefix = config.prefix;
-
+const async = require("async");
 
 /*
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////TODO////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///Think ways of making commands shorter / maybe using pipe to seperate
-///args instead of spaces
+///args instead of spaces  --DONE
 ///Get custom commands working
 ///
 ///
@@ -37,8 +37,19 @@ const reactions = require('./functions/reactions.js');
 const join = require('./functions/join.js');
 const leave = require('./functions/leave.js');
 const playlist = require('./functions/playlist.js');
+const search = require('./functions/search.js');
+const dumb = require('./functions/dumb.js');
 
 let db = new Database('databases/foobar.db')
+
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+
+
 
 
 client.on('ready', () => {
@@ -48,119 +59,186 @@ client.on('ready', () => {
 client.on('message', async function (msg) {
 
   if (!msg.content.startsWith(prefix) || msg.author.bot) return;
-  const args = msg.content.slice(prefix.length).split(' ');
+
+  var args = msg.content.slice(prefix.length).split(' ');
   const command = args.shift().toLowerCase();
+  var strung = args.join(" ");
 
-  if (msg.channel.type === 'dm' && command !== 'help' && command !== 'help-in-channel') {
-    msg.channel.send("sorry I don't work in DMs except for the help command");
-    return;
-  }
+  newargs = []
+  asyncForEach(strung.split("|"), async (x) => {
+    newargs.push(x.trim().toLowerCase());
+  }).then(() => {
+    args = newargs;
+    //const command = args.shift().toLowerCase();
+    if (msg.channel.type === 'dm' && command !== 'help' && command !== 'help in channel') {
+      msg.channel.send("sorry I don't work in DMs except for the help command");
+      return;
+    }
 
-  //CONSOLE LOG FOR COMMAND AND IF AUTHOR HAS PERMS
-  //console.log(command);
-  //console.log(database.check_if_valid_author(msg, db).toString() + " The Perms are");
-
-
-  //HELP COMMANDS
-
-  if (command === "help") {
-    help.help(msg);
-  }
-  else if (command === "help-in-channel") {
-    help.help_in_channel(msg);
-  }
-
-  //DEVELOPER COMMANDS
-
-  else if (command === "bot-status-sensitive" && developer.developer_check(msg)) {
-    developer.bot_status_sensitive(msg, client, db, voice.get_queues());
-  }
-  else if (command === "test-playlist") {
-    playlist.test_playlist(msg, client, db);
-  }
+    //CONSOLE LOG FOR COMMAND AND IF AUTHOR HAS PERMS
+    console.log(command);
+    console.log(args);
+    //console.log(database.check_if_valid_author(msg, db).toString() + " The Perms are");
 
 
-  //COMMANDS START HERE
 
-  else if (command === "bot-status") {
-    developer.bot_status(msg, client, db, voice.get_queues());
-  }
-  else if (command === "server-status") {
-    developer.server_status(msg, client, db, voice.get_queues());
-  }
 
-  else if (command === "make-playlist") {
-    playlist.make_playlist(msg, client, db, args);
-  }
-  else if (command === "play-playlist-order") {
-    playlist.play_playlist(msg, client, db, args);
-  }
-  else if (command === 'play-playlist') {
-    playlist.play_playlist_random(msg, client, db, args);
-  }
-  else if (command === "add-to-playlist"){
-    playlist.add_to_playlist(msg,client,db,args);
-  }
+    //HELP COMMANDS
 
-  else if (command === "add" && permissions.check_if_valid_author(msg, db)) {
-    console.log("IN ADD");
-    permissions.add(msg, args, db);
-  }
-  else if (command === 'args-test') {
-    test.args_test(msg, args);
-  }
-  else if (command === 'list-custom-commands') {
-    permissions.listall(msg, db);
-  }
-  else if (command === 'remove' && permissions.check_if_valid_author(msg, db)) {
-    permissions.remove(msg, args, db);
-  }
-  else if (command === 'add-perms' && permissions.check_if_valid_author(msg, db)) {
-    permissions.add_user(msg, args, db);
-  }
-  else if (command === 'remove-perms' && permissions.check_if_valid_author(msg, db)) {
-    permissions.remove_user(msg, db);
-  }
-  else if (command === 'list-perms') {
-    permissions.list_perms(msg, db);
-  }
-  else if (command === 'join-vc') {
-    voice.join_vc(msg, client);
-  }
-  else if (command === 'leave-vc') {
-    voice.leave_vc(msg, client);
-  }
-  else if (command === 'add-song') {
-    voice.add_song(msg, client, args, db);
-  }
-  else if (command === 'play') {
-    voice.play(msg, client, args, db);
-  }
-  else if (command === 'remove-song') {
-    voice.remove_song(msg, client, args, db);
-  }
-  else if (command === 'list-song') {
-    voice.list_song(msg, client, args, db);
-  }
-  else if (command === 'add-to-watch') {
-    reactions.add_message_to_watch(msg, args, db);
-  }
-  else if (command === 'remove-from-watch') {
-    reactions.remove_message_from_watch(msg, args, db);
-  }
-  else if (command === 'list-watch') {
-    reactions.list_watch(msg, args, db, client);
-  }
-  else if (command === 'skip') {
-    voice.skip(msg, client);
-  }
-  else if (command === 'queue') {
-    voice.queue(msg, client);
-  }
-  //custom command parsing
-  else {
-    permissions.custom(msg, command, db);
-  }
+    if (command === "help old") {
+      help.help_old(msg, args);
+    }
+    else if (command === "help in channel old") {
+      help.help_in_channel_old(msg, args);
+    }
+    else if (command === "help") {
+      help.help(msg, args, client);
+    }
+
+    //DEVELOPER COMMANDS
+
+    else if (command === "bot status sensitive" && developer.developer_check(msg)) {
+      developer.bot_status_sensitive(msg, client, db, voice.get_queues());
+    }
+    else if (command === "test playlist") {
+      //playlist.test_playlist(msg, client, db);
+    }
+    else if (command === "find oldest") {
+      //developer.oldestAccount(msg);
+    }
+
+
+    //COMMANDS START HERE
+
+
+    else if (command === "stream") {
+      voice.stream(msg, args[0], client);
+    }
+    else if (command === "play") {
+      voice.search(msg, args[0], client);
+    }
+    else if (command === "bot-status") {
+      developer.bot_status(msg, client, db, voice.get_queues());
+    }
+    else if (command === "server-status") {
+      developer.server_status(msg, client, db, voice.get_queues());
+    }
+
+    else if (command === "make playlist") {
+      //playlist.make_playlist(msg, client, db, args);
+    }
+    else if (command === "play playlist order") {
+      //playlist.play_playlist(msg, client, db, args);
+    }
+    else if (command === 'play playlist') {
+      //playlist.play_playlist_random(msg, client, db, args);
+    }
+    else if (command === "add to playlist") {
+      //playlist.add_to_playlist(msg, client, db, args);
+    }
+    else if (command === "delete playlist") {
+      //playlist.delete_playlist(msg, client, db, args);
+    }
+    else if (command === "repeat") {
+      //playlist.repeat(msg, client, db, args);
+    }
+    else if (command === "list all playlists") {
+      //playlist.list_playlist(msg, client, db, args);
+    }
+    else if (command === "list playlist content") {
+      //playlist.list_playlist_content(msg, client, db, args);
+    }
+
+    else if (command === "add" && permissions.check_if_valid_author(msg, db)) {
+      //console.log("IN ADD");
+      //permissions.add(msg, args, db);
+    }
+    else if (command === 'args test') {
+      //test.args_test(msg, args);
+    }
+    else if (command === 'list custom commands') {
+      //permissions.listall(msg, db);
+    }
+    else if (command === 'remove' && permissions.check_if_valid_author(msg, db)) {
+      //permissions.remove(msg, args, db);
+    }
+    else if (command === 'add-perms' && permissions.check_if_valid_author(msg, db)) {
+      permissions.add_user(msg, args, db);
+    }
+    else if (command === 'remove-perms' && permissions.check_if_valid_author(msg, db)) {
+      permissions.remove_user(msg, db);
+    }
+    else if (command === 'list-perms') {
+      permissions.list_perms(msg, db);
+    }
+    else if (command === 'join vc') {
+      //voice.join_vc(msg, client);
+    }
+    else if (command === 'leave-vc'&& permissions.check_if_valid_author(msg, db)) {
+      voice.leave_vc(msg, client);
+    }
+    else if (command === 'add song') {
+      //voice.add_song(msg, client, args, db);
+    }
+    else if (command === 'play local') {
+      //voice.play(msg, client, args, db);
+    }
+    else if (command === 'remove song') {
+      //voice.remove_song(msg, client, args, db);
+    }
+    else if (command === 'library') {
+      //voice.list_song(msg, client, args, db);
+    }
+    else if (command === 'add-watch' && permissions.check_if_valid_author(msg, db)) {
+      reactions.add_message_to_watch(msg, args, db);
+    }
+    else if (command === 'remove-watch' && permissions.check_if_valid_author(msg, db)) {
+      reactions.remove_message_from_watch(msg, args, db);
+    }
+    else if (command === 'list-watch') {
+      reactions.list_watch(msg, args, db, client);
+    }
+    else if (command === 'skip') {
+      voice.skip(msg, client, db);
+    }
+    else if (command === 'queue') {
+      voice.list_queue(msg, client, args);
+    }
+    else if (['empty-queue','eq'].includes(command) && permissions.check_if_valid_author(msg, db)) {
+      voice.clear_queue(msg, client);
+    }
+    else if (command === 'kill' && developer.developer_check(msg)) {
+      kill(client, msg);
+    }
+    else if (command === 'r') {
+      voice.rickroll(msg, client);
+    }
+    else if (command === "hlep") {
+      let items = ["c:", "oop", ":/", "No Kendall", "I am boot", "beep boop"]
+      msg.channel.send(items[Math.floor(Math.random() * items.length)]);
+    }
+    else if (['now-playing','np','nowplaying'].includes(command)) {
+      voice.now_playing(msg, client);
+    }
+    else if (command === 'search') {
+      search.search(msg, args[0]);
+    }
+    else if (command === 'meme') {
+      search.meme(msg, args[0]);
+    }
+    else if (command === 'owo') {
+      dumb.owo(msg, args[0], args[1]);
+    }
+
+
+
+
+
+    //custom command parsing
+    else {
+      permissions.custom(msg, command, db);
+    }
+  })
 });
 
 client.on('messageReactionAdd', async (reaction, user) => {
@@ -178,5 +256,17 @@ client.on('guildCreate', async (guild) => {
 client.on('guildDelete', async (guild) => {
   leave.onLeave(guild, db);
 })
+
+function kill(client, msg) {
+  msg.channel.send(new Discord.MessageEmbed().setTitle("Terminating Bot")).then(() => {
+    msg.delete().then(() => {
+      client.destroy();
+      process.exit();
+    })
+
+
+  })
+
+}
 
 client.login(config.token);

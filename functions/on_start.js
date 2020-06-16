@@ -1,6 +1,21 @@
 const Discord = require('discord.js');
 const Database = require('better-sqlite3');
 
+/*
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////TODO////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///
+///
+///
+///
+///
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+*/
+
+
 options = {
     "readonly": false,
     "fileMustExist": false,
@@ -17,6 +32,8 @@ module.exports = {
             //guild.id;
             //perms
             //custom commands
+            client.user.setPresence({ activity: { name: 'Use $help'}, status: 'online'})
+
 
             if (!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = '${guild.id}_perms';`).get()) {
                 db.prepare(`CREATE TABLE '${guild.id}_perms' (discord_id TEXT PRIMARY KEY, perm_level INTEGER NOT NULL)`).run();
@@ -40,8 +57,8 @@ module.exports = {
         });
         output = db.prepare(`SELECT * FROM sqlite_master WHERE type='table'`).all()
         output.forEach(x => {
-            db.prepare(`SELECT * FROM '${x['name']}'`).all().forEach(i => { console.log(i) })
-            console.log();
+            db.prepare(`SELECT * FROM '${x['name']}'`).all().forEach(i => { /*console.log(i)*/ })
+            //console.log();
         })
         console.log("loaded all servers, bot is live");
     }

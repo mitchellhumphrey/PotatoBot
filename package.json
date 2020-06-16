@@ -15,7 +15,13 @@
     "discord.js": "^12.2.0",
     "download-file": "^0.1.5",
     "mongodb": "^3.5.7",
+    "node-duckduckgo": "^2.0.11",
+    "nodemon": "^2.0.4",
+    "nodeyourmeme": "^2.0.0",
+    "owoify-js": "^1.0.7",
     "unix-timestamp": "^0.2.0",
-    "ytdl-core": "^2.1.3"
+    "wikijs": "^6.0.1",
+    "ytdl-core": "^2.1.3",
+    "ytsr": "^0.1.15"
   }
 }

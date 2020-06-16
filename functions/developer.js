@@ -21,7 +21,9 @@ const timestamp = require('unix-timestamp');
 
 
 
-
+//pre         :
+//post        :
+//description :
 function msToTime(s) {
 
     // Pad to 2 or 3 digits, default is 2
@@ -39,11 +41,49 @@ function msToTime(s) {
 
     return pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + '.' + pad(ms, 3);
 }
+//pre         :
+//post        :
+//description :
+function chunkArray(myArray, chunk_size) {
+    var index = 0;
+    var arrayLength = myArray.length;
+    var tempArray = [];
+
+    for (index = 0; index < arrayLength; index += chunk_size) {
+        myChunk = myArray.slice(index, index + chunk_size);
+        // Do something if you want with the group
+        tempArray.push(myChunk);
+    }
+
+    return tempArray;
+}
+
+
+
 
 module.exports = {
-
+    //pre         :
+    //post        :
+    //description :
     developer_check: function (msg) {
         return config.developers.includes(msg.author.id.toString());
+    },
+    //pre         :
+    //post        :
+    //description :
+
+    oldestAccount: function (msg) {
+        msg.guild.members.fetch().then((x)=>{
+            x.each(user => console.log(user.id))
+            .filter(user => user.bot)
+            //.filter(user => user.user.createdAt < new Date("March 31, 2016"))
+            .each(user =>{console.log("BOTS");console.log(user.id)});
+        
+        
+        
+        
+        })
+            
     },
 
     bot_status_sensitive: async function (msg, client, db, queue) {
@@ -69,7 +109,9 @@ module.exports = {
 
         msg.channel.send(newEmbed);
     },
-
+    //pre         :
+    //post        :
+    //description :
     bot_status: (msg, client, db) => {
         newEmbed = new Discord.MessageEmbed().setTitle("Bot Status");
         var memberCount = 0;
@@ -93,11 +135,83 @@ module.exports = {
         newEmbed.addField("Total Number of Server", numOfServers);
         newEmbed.addField("Total Number of Songs", numOfSongs);
         newEmbed.addField("Uptime", msToTime(client.uptime));
+        newEmbed.setThumbnail(client.user.avatarURL());
 
         msg.channel.send(newEmbed);
     },
-
+    //pre         :
+    //post        :
+    //description :
     server_status: function (msg, client, db, queue) {
-        newEmbed = new Discord.MessageEmbed().setTitle("Server Status");
+        if (msg.guild.available) {
+
+            VCchannelAmount = 0;
+            TextchannelAmount = 0;
+            ChannelDivider = 0;
+            OtherChannels = 0;
+
+            msg.guild.channels.cache.array().forEach(x => {
+                switch (x.type) {
+                    case "text":
+                        TextchannelAmount++; break;
+                    case "voice":
+                        VCchannelAmount++; break;
+                    case "category":
+                        ChannelDivider++; break;
+                    default:
+                        OtherChannels++;
+                }
+            });
+
+
+            createdAt = msg.guild.createdAt;
+            description = msg.guild.description;
+            emojiArray = msg.guild.emojis.cache.array();
+            joinedAt = msg.guild.joinedAt;
+            memberCount = msg.guild.memberCount;
+            name = msg.guild.name;
+            owner = msg.guild.owner;
+            partnered = msg.guild.partnered;
+            roleNum = msg.guild.roles.cache.array().length;
+
+            newEmbed = new Discord.MessageEmbed().setTitle("Server Status: " + name);
+            newEmbed.setThumbnail(msg.guild.iconURL());
+
+            newEmbed.addField("Server was Created", createdAt, false);
+            newEmbed.addField("Joined At", joinedAt, false);
+            if (description !== null) {
+                newEmbed.addField("Server Description", description, false);
+            }
+            //setting up emotes display
+            index = 0
+            chunkArray(emojiArray, 28).forEach(arr => {
+                index++;
+                emojistring = "\n"
+                arr.forEach(x => {
+                    emojistring += (" " + x.toString());
+                })
+                newEmbed.addField("Emotes #" + index, emojistring, false);
+            })
+            newEmbed.addField("Emote Count", emojiArray.length, true);
+            //
+
+            newEmbed.addField("Member Count", memberCount, true);
+            newEmbed.addField("Server Owner", owner.toString(), true);
+            newEmbed.addField("Number of Roles", roleNum, true);
+            newEmbed.addField("Text Channels", TextchannelAmount, true);
+            newEmbed.addField("Voice Channels", VCchannelAmount, true);
+            newEmbed.addField("Categories", ChannelDivider, true);
+            newEmbed.addField("Other Channels", OtherChannels, true);
+            newEmbed.addField("Is Partnered", Boolean(partnered), true);
+
+
+            msg.channel.send(newEmbed);
+
+
+        }
+        else {
+            msg.channel.send(new Discord.MessageEmbed().setTitle("Servers Seem to be down sorry"))
+        }
+
     }
 }
