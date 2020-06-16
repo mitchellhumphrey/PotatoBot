@@ -153,7 +153,7 @@ function stream(msg, songlink, client) {
                 if (server_queue.playing_state[msg.guild.id] === false) {
                     msg.channel.send(new Discord.MessageEmbed().setColor('#00FF00').setImage(img_link)
                         .setTitle("Now Playing: " + info['title'].toString())
-                        .addField("Added By:", msg.author.toString(), false)
+                        .addField("Added By:", msg.author.toString(), true)
                         .addField("Length:", (minutes + " minutes " + seconds + " seconds"), true)
                         .addField("Uploaded By:", author, true)
                         .addField("URL:", ("[Click Here](" + String(songlink) + ")"), true));
@@ -441,9 +441,9 @@ module.exports = {
                 if (server_queue[msg.guild.id][Number(args[0]) - 1].hasOwnProperty('metadata')) {
                     const obj_data = server_queue[msg.guild.id][Number(args[0]) - 1].metadata;
                     msg.channel.send(new Discord.MessageEmbed().setColor('#00FF00').setImage(img_link)
-                        .setTitle("Queue #: " + args[0])
-                        .addField("Title", obj_data.title, true)
-                        .addField("Added By:", obj_data.added_by, false)
+                        .setTitle("Queue #" + args[0])
+                        .addField("Title", obj_data.title, false)
+                        .addField("Added By:", obj_data.added_by, true)
                         .addField("Length:", (obj_data.minutes + " minute(s) " + obj_data.seconds + " seconds"), true)
                         .addField("Uploaded By:", obj_data.author)
                         .addField("URL:", "[Click Here](" + String(obj_data.song_link) + ")", true));
@@ -521,8 +521,8 @@ module.exports = {
         //console.log(metadata);
         if (server_queue.playing_state[msg.guild.id]) {
             message.addField("URL:", "[Click Here](" + String(metadata.song_link) + ")", true);
-            message.setTitle("Now Playing: " + metadata.title, true);
-            message.addField("Added By:", metadata.added_by, false);
+            message.setTitle("Now Playing: " + metadata.title, false);
+            message.addField("Added By:", metadata.added_by, true);
             message.addField("Length:", (metadata.minutes + " minute(s) " + metadata.seconds + " seconds"), true);
             message.addField("Uploaded By:", metadata.author, true);
             msg.channel.send(message);
