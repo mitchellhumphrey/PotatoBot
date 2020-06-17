@@ -98,7 +98,7 @@ client.on('message', async function (msg) {
 
     //DEVELOPER COMMANDS
 
-    else if (command === "bot status sensitive" && developer.developer_check(msg)) {
+    else if (command === "bot-status-sensitive" && developer.developer_check(msg)) {
       developer.bot_status_sensitive(msg, client, db, voice.get_queues());
     }
     else if (command === "test playlist") {
