@@ -43,7 +43,7 @@ defaultHelp.addField("**Reaction Role Help**",config.prefix+"help reaction",true
 
 const musicHelp = new Discord.MessageEmbed().setTitle("Music");
 musicHelp.setDescription(title);
-musicHelp.addField("**"+config.prefix+"stream <url>**", "plays a song without adding to the bot library");
+//musicHelp.addField("**"+config.prefix+"stream <url>**", "plays a song without adding to the bot library");
 musicHelp.addField("**"+config.prefix+"play <query>**","streams first video from YouTube that matches the query");
 musicHelp.addField("**"+config.prefix+"queue**","lists all songs in queue");
 musicHelp.addField("**"+config.prefix+"skip**","skips current song to next in queue, if queue is empty, bot will leave VC (Must have perms or Added the Song)");

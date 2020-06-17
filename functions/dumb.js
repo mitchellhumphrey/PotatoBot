@@ -2,14 +2,7 @@ const owoify = require('owoify-js').default
 
 module.exports = {
     owo: function (msg, term, severity) {
-
         var str = 'owo';
-
-        /*if (msg.mentions){
-            msg.channel.send(owoify(term.nickname,'uwu'))
-            return;
-        }*/
-
         if (severity === '1') {
             str = 'uwu';
         }

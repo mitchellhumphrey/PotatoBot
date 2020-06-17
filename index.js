@@ -39,6 +39,7 @@ const leave = require('./functions/leave.js');
 const playlist = require('./functions/playlist.js');
 const search = require('./functions/search.js');
 const dumb = require('./functions/dumb.js');
+const guildadd = require ('./functions/guildmemberadd.js');
 
 let db = new Database('databases/foobar.db')
 
@@ -255,6 +256,10 @@ client.on('guildCreate', async (guild) => {
 
 client.on('guildDelete', async (guild) => {
   leave.onLeave(guild, db);
+})
+
+client.on('guildMemberAdd', async(member)=>{
+  guildadd.onAdd(member,client,db);
 })
 
 function kill(client, msg) {
