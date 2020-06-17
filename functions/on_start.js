@@ -32,7 +32,7 @@ module.exports = {
             //guild.id;
             //perms
             //custom commands
-            client.user.setPresence({ activity: { name: 'Use $help'}, status: 'online'})
+            client.user.setPresence({ activity: { name: 'Use $help' }, status: 'online' })
 
 
             if (!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = '${guild.id}_perms';`).get()) {
@@ -51,13 +51,17 @@ module.exports = {
                 db.prepare(`CREATE TABLE '${guild.id}_playlist' (playlist_name TEXT PRIMARY KEY, JSON_as_string TEXT NOT NULL)`).run();
                 console.log("ADDED PLAYLIST TABLE FOR GUILD ID " + guild.id)
             }
+            if (!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = 'onJoin';`).get()) {
+                db.prepare(`CREATE TABLE 'onJoin' (id TEXT PRIMARY KEY, roleID TEXT NOT NULL)`).run();
+                console.log("Made onJoin table");
+            }
 
 
 
         });
         output = db.prepare(`SELECT * FROM sqlite_master WHERE type='table'`).all()
         output.forEach(x => {
-            db.prepare(`SELECT * FROM '${x['name']}'`).all().forEach(i => { /*console.log(i)*/ })
+            db.prepare(`SELECT * FROM '${x['name']}'`).all().forEach(i => { console.log(i) })
             //console.log();
         })
         console.log("loaded all servers, bot is live");

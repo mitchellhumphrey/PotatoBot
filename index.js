@@ -101,12 +101,6 @@ client.on('message', async function (msg) {
     else if (command === "bot-status-sensitive" && developer.developer_check(msg)) {
       developer.bot_status_sensitive(msg, client, db, voice.get_queues());
     }
-    else if (command === "test playlist") {
-      //playlist.test_playlist(msg, client, db);
-    }
-    else if (command === "find oldest") {
-      //developer.oldestAccount(msg);
-    }
 
 
     //COMMANDS START HERE
@@ -124,45 +118,6 @@ client.on('message', async function (msg) {
     else if (command === "server-status") {
       developer.server_status(msg, client, db, voice.get_queues());
     }
-
-    else if (command === "make playlist") {
-      //playlist.make_playlist(msg, client, db, args);
-    }
-    else if (command === "play playlist order") {
-      //playlist.play_playlist(msg, client, db, args);
-    }
-    else if (command === 'play playlist') {
-      //playlist.play_playlist_random(msg, client, db, args);
-    }
-    else if (command === "add to playlist") {
-      //playlist.add_to_playlist(msg, client, db, args);
-    }
-    else if (command === "delete playlist") {
-      //playlist.delete_playlist(msg, client, db, args);
-    }
-    else if (command === "repeat") {
-      //playlist.repeat(msg, client, db, args);
-    }
-    else if (command === "list all playlists") {
-      //playlist.list_playlist(msg, client, db, args);
-    }
-    else if (command === "list playlist content") {
-      //playlist.list_playlist_content(msg, client, db, args);
-    }
-
-    else if (command === "add" && permissions.check_if_valid_author(msg, db)) {
-      //console.log("IN ADD");
-      //permissions.add(msg, args, db);
-    }
-    else if (command === 'args test') {
-      //test.args_test(msg, args);
-    }
-    else if (command === 'list custom commands') {
-      //permissions.listall(msg, db);
-    }
-    else if (command === 'remove' && permissions.check_if_valid_author(msg, db)) {
-      //permissions.remove(msg, args, db);
-    }
     else if (command === 'add-perms' && permissions.check_if_valid_author(msg, db)) {
       permissions.add_user(msg, args, db);
     }
@@ -171,24 +126,6 @@ client.on('message', async function (msg) {
     }
     else if (command === 'list-perms') {
       permissions.list_perms(msg, db);
-    }
-    else if (command === 'join vc') {
-      //voice.join_vc(msg, client);
-    }
-    else if (command === 'leave-vc'&& permissions.check_if_valid_author(msg, db)) {
-      voice.leave_vc(msg, client);
-    }
-    else if (command === 'add song') {
-      //voice.add_song(msg, client, args, db);
-    }
-    else if (command === 'play local') {
-      //voice.play(msg, client, args, db);
-    }
-    else if (command === 'remove song') {
-      //voice.remove_song(msg, client, args, db);
-    }
-    else if (command === 'library') {
-      //voice.list_song(msg, client, args, db);
     }
     else if (command === 'add-watch' && permissions.check_if_valid_author(msg, db)) {
       reactions.add_message_to_watch(msg, args, db);
@@ -229,6 +166,15 @@ client.on('message', async function (msg) {
     }
     else if (command === 'owo') {
       dumb.owo(msg, args[0], args[1]);
+    }
+    else if (command === 'set-join-role'){
+      guildadd.set(args,db,msg);
+    }
+    else if (command === 'remove-join-role'){
+      guildadd.remove(db,msg);
+    }
+    else if (command === 'join-list'){
+      guildadd.list(msg,db);
     }
 
 

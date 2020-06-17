@@ -120,25 +120,15 @@ module.exports = {
         client.guilds.cache.map((x) => {
             memberCount += x.memberCount;
             numOfServers++;
-            db.prepare(`SELECT * FROM '${x.id}_music'`).all().forEach(z => {
-                //console.log(x.name)
-                numOfSongs++;
-            });
-
-
-
-
-
-
         })
         newEmbed.addField("Watching Over", memberCount.toString() + " members");
         newEmbed.addField("Total Number of Server", numOfServers);
-        newEmbed.addField("Total Number of Songs", numOfSongs);
         newEmbed.addField("Uptime", msToTime(client.uptime));
         newEmbed.setThumbnail(client.user.avatarURL());
 
         msg.channel.send(newEmbed);
     },
+    
     //pre         :
     //post        :
     //description :
