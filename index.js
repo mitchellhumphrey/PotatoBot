@@ -39,7 +39,7 @@ const leave = require('./functions/leave.js');
 const playlist = require('./functions/playlist.js');
 const search = require('./functions/search.js');
 const dumb = require('./functions/dumb.js');
-const guildadd = require ('./functions/guildmemberadd.js');
+const guildadd = require('./functions/guildmemberadd.js');
 
 let db = new Database('databases/foobar.db')
 
@@ -142,7 +142,7 @@ client.on('message', async function (msg) {
     else if (command === 'queue') {
       voice.list_queue(msg, client, args);
     }
-    else if (['empty-queue','eq'].includes(command) && permissions.check_if_valid_author(msg, db)) {
+    else if (['empty-queue', 'eq'].includes(command) && permissions.check_if_valid_author(msg, db)) {
       voice.clear_queue(msg, client);
     }
     else if (command === 'kill' && developer.developer_check(msg)) {
@@ -155,7 +155,7 @@ client.on('message', async function (msg) {
       let items = ["c:", "oop", ":/", "No Kendall", "I am boot", "beep boop"]
       msg.channel.send(items[Math.floor(Math.random() * items.length)]);
     }
-    else if (['now-playing','np','nowplaying'].includes(command)) {
+    else if (['now-playing', 'np', 'nowplaying'].includes(command)) {
       voice.now_playing(msg, client);
     }
     else if (command === 'search') {
@@ -167,14 +167,14 @@ client.on('message', async function (msg) {
     else if (command === 'owo') {
       dumb.owo(msg, args[0], args[1]);
     }
-    else if (command === 'set-join-role'){
-      guildadd.set(args,db,msg);
+    else if (command === 'joinrole-set') {
+      guildadd.set(args, db, msg);
     }
-    else if (command === 'remove-join-role'){
-      guildadd.remove(db,msg);
+    else if (command === 'joinrole-remove') {
+      guildadd.remove(db, msg);
     }
-    else if (command === 'join-list'){
-      guildadd.list(msg,db);
+    else if (command === 'joinrole-list') {
+      guildadd.list(msg, db, client);
     }
 
 
@@ -204,8 +204,8 @@ client.on('guildDelete', async (guild) => {
   leave.onLeave(guild, db);
 })
 
-client.on('guildMemberAdd', async(member)=>{
-  guildadd.onAdd(member,client,db);
+client.on('guildMemberAdd', async (member) => {
+  guildadd.onAdd(member, client, db);
 })
 
 function kill(client, msg) {
