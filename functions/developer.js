@@ -107,7 +107,7 @@ module.exports = {
 
 
 
-        msg.channel.send(newEmbed);
+        msg.channel.send(in_these_servers);
     },
     //pre         :
     //post        :
