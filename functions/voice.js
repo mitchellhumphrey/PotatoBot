@@ -476,7 +476,8 @@ module.exports = {
     //pre         :
     //post        :
     //description :returns server_queue global object for use in other files
-    get_queues: () => {
+    get_queues: (client) => {
+        server_queue = create_server_queues(server_queue, client);
         return server_queue;
     },
     //pre         :

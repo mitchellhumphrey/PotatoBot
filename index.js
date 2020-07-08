@@ -5,6 +5,8 @@ const fs = require('fs');
 const Database = require('better-sqlite3');
 const prefix = config.prefix;
 const async = require("async");
+const DBL = require("dblapi.js");
+const dbl = new DBL(config.dblToken, client);
 
 /*
 ///////////////////////////////////////////////////////////////////////////
@@ -40,7 +42,7 @@ const playlist = require('./functions/playlist.js');
 const search = require('./functions/search.js');
 const dumb = require('./functions/dumb.js');
 const guildadd = require('./functions/guildmemberadd.js');
-const dbl = require('./functions/dbl.js');
+const dblfile = require('./functions/dbl.js');
 
 let db = new Database('databases/foobar.db')
 
@@ -52,10 +54,15 @@ async function asyncForEach(array, callback) {
 }
 
 
-
+dbl.webhook.on('posted', () => {
+  console.log('Server count posted!');
+});
 
 client.on('ready', () => {
   start.start(db, client);
+  setInterval(() => {
+    dbl.postStats(client.guilds.size, client.shards.Id, client.shards.total);
+  }, 1800000);
 });
 
 client.on('message', async function (msg) {
@@ -100,13 +107,16 @@ client.on('message', async function (msg) {
     //DEVELOPER COMMANDS
 
     else if (command === "bot-status-sensitive" && developer.developer_check(msg)) {
-      developer.bot_status_sensitive(msg, client, db, voice.get_queues());
+      developer.bot_status_sensitive(msg, client, db, voice.get_queues(client));
+    }
+    else if (command === "music-status" && developer.developer_check(msg)){
+      developer.music_status(msg,client,voice.get_queues(client));
     }
 
 
     //COMMANDS START HERE
     else if (command === "vote"){
-      dbl.vote(msg);
+      dblfile.vote(msg);
     }
     else if (command === "support"){
       help.support(msg);
@@ -119,10 +129,10 @@ client.on('message', async function (msg) {
       voice.search(msg, args[0], client);
     }
     else if (command === "bot-status") {
-      developer.bot_status(msg, client, db, voice.get_queues());
+      developer.bot_status(msg, client, db, voice.get_queues(client));
     }
     else if (command === "server-status") {
-      developer.server_status(msg, client, db, voice.get_queues());
+      developer.server_status(msg, client, db, voice.get_queues(client));
     }
     else if (command === 'add-perms' && permissions.check_if_valid_author(msg, db)) {
       permissions.add_user(msg, args, db);

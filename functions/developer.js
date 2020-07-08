@@ -137,13 +137,36 @@ module.exports = {
             }
             
         })
-        newEmbed.addField("Watching Over", memberCount.toString() + " members + bots");
+        newEmbed.addField("Watching Over", memberCount.toString() + " members");
         newEmbed.addField("Online Users",numOfNonBots)
         newEmbed.addField("Total Number of Servers", numOfServers);
         newEmbed.addField("Uptime", msToTime(client.uptime));
         newEmbed.setThumbnail(client.user.avatarURL());
 
         msg.channel.send(newEmbed);
+    },
+
+    music_status:function(msg,client,queue){
+        //only let me run this
+        //console.log(queue);
+        //msg.channel.send(JSON.stringify(queue))
+        
+        let amtPlay = 0;
+        for (var key in queue['playing_state']){
+            if(queue['playing_state'].hasOwnProperty(key)){
+                if(queue['playing_state'][key]===true) amtPlay++;
+            }
+        }
+        msg.channel.send(amtPlay);
+
+
+        msg.channel.send(JSON.stringify(queue['playing_state']));
+
+
+    },
+
+    music_status_num:function(msg,client,queue){
+        
     },
     
     //pre         :
