@@ -54,8 +54,9 @@ async function asyncForEach(array, callback) {
 }
 
 
-dbl.webhook.on('posted', () => {
+dbl.on('posted', () => {
   console.log('Server count posted!');
+  //client.fetchUser("148812749260980224");
 });
 
 client.on('ready', () => {
