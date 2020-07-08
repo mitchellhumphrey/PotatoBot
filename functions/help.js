@@ -49,7 +49,12 @@ musicHelp.setDescription(title);
 musicHelp.addField("**"+config.prefix+"play <query>**","streams first video from YouTube that matches the query");
 musicHelp.addField("**"+config.prefix+"queue**","lists all songs in queue");
 musicHelp.addField("**"+config.prefix+"skip**","skips current song to next in queue, if queue is empty, bot will leave VC (Must have perms or Added the Song)");
-musicHelp.addField("**"+config.prefix+"empty-queue**","removes all songs from queue and leaves VC (Must have perms)");
+musicHelp.addField("**"+config.prefix+"empty-queue**","removes all songs from queue and leaves VC (Must have perms) \n ALAIS: `eq`");
+//musicHelp.addField("**"+config.prefix+"eq**","alais for empty-queue");
+musicHelp.addField("**"+config.prefix+"now-playing**","lists information of song that is currently playing \n ALAIS: `np`,`nowplaying`");
+
+
+'now-playing', 'np', 'nowplaying'
 
 
 

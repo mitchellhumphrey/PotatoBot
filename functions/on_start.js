@@ -49,12 +49,20 @@ module.exports = {
             }
             if (!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = '${guild.id}_playlist';`).get()) {
                 db.prepare(`CREATE TABLE '${guild.id}_playlist' (playlist_name TEXT PRIMARY KEY, JSON_as_string TEXT NOT NULL)`).run();
-                console.log("ADDED PLAYLIST TABLE FOR GUILD ID " + guild.id)
+                console.log("ADDED PLAYLIST TABLE FOR GUILD ID " + guild.id);
             }
+            if (!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name= '${guild.id}_command_log';`).get()){
+                db.prepare(`CREATE TABLE '${guild.id}_command_log' (key TEXT PRIMARY KEY,command TEXT NOT NULL, date TEXT NOT NULL)`).run();
+                console.log("ADDED COMMAND LOG TABLE");
+            }
+
+
+
             if (!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = 'onJoin';`).get()) {
                 db.prepare(`CREATE TABLE 'onJoin' (id TEXT PRIMARY KEY, roleID TEXT NOT NULL)`).run();
                 console.log("Made onJoin table");
             }
+
 
 
 

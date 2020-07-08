@@ -6,6 +6,9 @@ module.exports = {
 
 
         msg.channel.send(embed)
+    },
+    top_status : function (msg){
+        msg.channel.send(new Discord.MessageEmbed().setTitle("top.gg Status").setImage(url="https://top.gg/api/widget/636778046900273153.svg"));
     }
 
 
