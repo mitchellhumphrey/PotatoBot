@@ -130,7 +130,7 @@ module.exports = {
         var numOfServers = 0;
         var numOfNonBots = 0;
         client.guilds.cache.map((x) => {
-            if(x.id!==264445053596991498){
+            if(x.id.toString()!=="264445053596991498"){
                 memberCount += x.memberCount;
                 numOfServers++;
                 numOfNonBots += x.members.cache.filter(member => !member.user.bot).size;
