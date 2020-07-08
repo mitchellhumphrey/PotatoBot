@@ -128,13 +128,18 @@ module.exports = {
         newEmbed = new Discord.MessageEmbed().setTitle("Bot Status");
         var memberCount = 0;
         var numOfServers = 0;
-        var numOfSongs = 0;
+        var numOfNonBots = 0;
         client.guilds.cache.map((x) => {
-            memberCount += x.memberCount;
-            numOfServers++;
+            if(x.id!==264445053596991498){
+                memberCount += x.memberCount;
+                numOfServers++;
+                numOfNonBots += x.members.cache.filter(member => !member.user.bot).size;
+            }
+            
         })
-        newEmbed.addField("Watching Over", memberCount.toString() + " members");
-        newEmbed.addField("Total Number of Server", numOfServers);
+        newEmbed.addField("Watching Over", memberCount.toString() + " members + bots");
+        newEmbed.addField("Online Users",numOfNonBots)
+        newEmbed.addField("Total Number of Servers", numOfServers);
         newEmbed.addField("Uptime", msToTime(client.uptime));
         newEmbed.setThumbnail(client.user.avatarURL());
 

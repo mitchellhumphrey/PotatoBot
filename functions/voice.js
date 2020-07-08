@@ -25,6 +25,35 @@ const permissions = require('./permissions.js');
 */
 server_queue = { playing_state: new Object(), now_playing: new Object() }
 
+function skip (msg, client, db) {
+
+    if (msg.member.voice.channel !== null) {
+        let added = false;
+        if (server_queue.now_playing[msg.guild.id].hasOwnProperty('added_by')) {
+            if (server_queue.now_playing[msg.guild.id].added_by === msg.author.toString()) {
+                added = true;
+            }
+        }
+
+        if (permissions.check_if_valid_author(msg, db) || added) {
+            if (server_queue[msg.guild.id].length !== 0) {
+                start_play(msg, server_queue, client);
+            }
+            else {
+                msg.member.voice.channel.leave();
+                server_queue.playing_state[msg.guild.id] = false;
+            }
+            msg.react("✅")
+        }
+        else msg.react("❌")
+        
+
+    }
+    else {
+        msg.channel.send(new Discord.MessageEmbed().setTitle("Not in Voice Channel"))
+        //msg.delete();
+    };
+}
 
 
 //pre         :
@@ -377,37 +406,10 @@ module.exports = {
     //pre         :
     //post        :
     //description :
-    skip: function (msg, client, db) {
-
-        if (msg.member.voice.channel !== null) {
-            let added = false;
-            if (server_queue.now_playing[msg.guild.id].hasOwnProperty('added_by')) {
-                if (server_queue.now_playing[msg.guild.id].added_by === msg.author.toString()) {
-                    added = true;
-                }
-            }
-
-            if (permissions.check_if_valid_author(msg, db) || added) {
-                if (server_queue[msg.guild.id].length !== 0) {
-                    start_play(msg, server_queue, client);
-                }
-                else {
-                    msg.member.voice.channel.leave();
-                    server_queue.playing_state[msg.guild.id] = false;
-                }
-                msg.react("✅")
-            }
-            else msg.react("❌")
-            
-
-        }
-        else {
-            msg.channel.send(new Discord.MessageEmbed().setTitle("Not in Voice Channel"))
-            //msg.delete();
-        }
+    skip: function(msg, client, db){skip(msg, client, db)}
 
 
-    },
+    ,
     //pre         :
     //post        :
     //description :
@@ -455,13 +457,21 @@ module.exports = {
     //pre         :
     //post        :
     //description :removes all songs from queue in server
-    clear_queue: function (msg, client) {
+    clear_queue: function (msg, client,db) {
         server_queue = create_server_queues(server_queue, client);
         server_queue[msg.guild.id] = [];
         if (msg.member.voice) {
-            msg.member.voice.channel.leave();
+            try{
+                msg.member.voice.channel.leave();
+            }
+            catch (err){
+                console.log(err);
+            }
+            
         }
-        server_queue[playing_state][msg.guild.id]=false;
+        console.log(server_queue);
+        server_queue.playing_state[msg.guild.id]=false;
+        skip(msg,client,db);
     },
     //pre         :
     //post        :

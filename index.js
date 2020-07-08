@@ -40,6 +40,7 @@ const playlist = require('./functions/playlist.js');
 const search = require('./functions/search.js');
 const dumb = require('./functions/dumb.js');
 const guildadd = require('./functions/guildmemberadd.js');
+const dbl = require('./functions/dbl.js');
 
 let db = new Database('databases/foobar.db')
 
@@ -104,7 +105,12 @@ client.on('message', async function (msg) {
 
 
     //COMMANDS START HERE
-
+    else if (command === "vote"){
+      dbl.vote(msg);
+    }
+    else if (command === "support"){
+      help.support(msg);
+    }
 
     else if (command === "stream") {
       voice.stream(msg, args[0], client);
@@ -143,7 +149,7 @@ client.on('message', async function (msg) {
       voice.list_queue(msg, client, args);
     }
     else if (['empty-queue', 'eq'].includes(command) && permissions.check_if_valid_author(msg, db)) {
-      voice.clear_queue(msg, client);
+      voice.clear_queue(msg, client,db);
     }
     else if (command === 'kill' && developer.developer_check(msg)) {
       kill(client, msg);

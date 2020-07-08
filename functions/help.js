@@ -36,7 +36,7 @@ helpEmbed.addField(`**${config.prefix}owo <term> | [strength]**`,"owoifies your 
 
 
 const defaultHelp = new Discord.MessageEmbed().setTitle('Help');
-defaultHelp.setDescription(`How To Use Bot: Prefix \`${config.prefix}\``);
+defaultHelp.setDescription(`How To Use Bot: Prefix \`${config.prefix}\`\n Support Server:  [Click Here](https://discord.com/invite/FbKsmNk) \n Vote for this bot: [Click Here](https://top.gg/bot/636778046900273153/vote)`);
 defaultHelp.addField("**Music Help**",config.prefix+"help music", true);
 defaultHelp.addField("**General Help**",config.prefix+"help general", true);
 defaultHelp.addField("**Reaction Role Help**",config.prefix+"help reaction",true);
@@ -89,6 +89,10 @@ module.exports = {
     help_in_channel : function (msg,args) {
         help_logic(msg,args);
         //msg.delete();
+    },
+    support : function (msg){
+        const embed = new Discord.MessageEmbed().setTitle("Get Support").setDescription("Join this Discord Server to Recieve Support: [Click Here](https://discord.com/invite/FbKsmNk)");
+        msg.channel.send(embed);
     }
 }
 
@@ -108,10 +112,6 @@ function help_logic(msg,args,client){
     else if (args[0]==="configure"){
         msg.channel.send(configureEmbed.setThumbnail(client.user.avatarURL()));
     }
-
-
-
-
     else msg.channel.send(defaultHelp.setThumbnail(client.user.avatarURL()))
-    
 }
+
