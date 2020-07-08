@@ -91,6 +91,7 @@ module.exports = {
         newEmbed = new Discord.MessageEmbed().setTitle("Bot Status");
         in_these_servers = "\n";
         length = 0;
+        message_array = []
         await client.guilds.cache.map(function (x) {
             let numOfSongs = 0;
             db.prepare(`SELECT * FROM '${x.id}_music'`).all().forEach(z => {
@@ -100,14 +101,25 @@ module.exports = {
             in_these_servers += (x.toString() + "\n");
             in_these_servers += ("     member count    : " + x.memberCount + "\n");
             in_these_servers += ("     joined date     : " + timestamp.toDate(x.joinedTimestamp / 1000).toString().substr(0, 24) + "\n");
-            in_these_servers += ("     Number of Songs : " + (numOfSongs) + "\n");
+            //in_these_servers += ("     Number of Songs : " + (numOfSongs) + "\n");
+            if (in_these_servers.length > 1500){
+                msg.channel.send(in_these_servers);
+                in_these_servers = "\n";
+            }
         });
+        if (in_these_servers.length <= 1500){
+            msg.channel.send(in_these_servers);
+            in_these_servers = "\n";
+        }
+        //message_array.push(in_these_servers);
         newEmbed.addField("**IN THESE SERVERS**", '```' + in_these_servers + "```");
         newEmbed.addField("Uptime", msToTime(client.uptime), false);
 
 
-
-        msg.channel.send(in_these_servers);
+        //for(text in message_array){
+        //  msg.channel.send(text);
+        //}
+        
     },
     //pre         :
     //post        :
