@@ -63,7 +63,7 @@ dbl.on('posted', () => {
 client.on('ready', () => {
   start.start(db, client);
   setInterval(() => {
-    dbl.postStats(client.guilds.size, client.shards.Id, client.shards.total);
+    dbl.postStats(client.guilds.size);
   }, 1800000);
 });
 
