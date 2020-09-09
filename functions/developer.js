@@ -86,6 +86,10 @@ module.exports = {
             
     },
 
+    setStatus: function (client, args){
+        client.user.setPresence({ activity: { name: args[0] }, status: 'online' })
+    },
+
     bot_status_sensitive: async function (msg, client, db, queue) {
 
         newEmbed = new Discord.MessageEmbed().setTitle("Bot Status");

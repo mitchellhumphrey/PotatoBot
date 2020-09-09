@@ -17,6 +17,34 @@ const Database = require('better-sqlite3');
 ///////////////////////////////////////////////////////////////////////////
 */
 
+async function messageReactionAddFunction(reaction, user, db) {
+    if (user.bot) return;
+    if (reaction.partial) {
+        // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
+        try {
+            await reaction.fetch();
+        } catch (error) {
+            console.log('Something went wrong when fetching the message: ', error);
+            // Return as `reaction.message.author` may be undefined/null
+            return;
+        }
+    }
+    console.log(`${reaction.message.content} was reacted with ${reaction.emoji}`)
+    if (is_in_database_as_message_watch(db, reaction.message.guild.id, reaction.message.id)) {
+        var role = db.prepare(`SELECT role_given FROM '${reaction.message.guild.id}_reaction_roles' WHERE message_id_to_watch='${reaction.message.id}';`).get()
+        console.log(role);
+
+        guild_member = reaction.message.guild.member(user)
+        //reaction.message.guild.roles.find('name',role)
+        console.log(role.role_given.substring(3, 21))
+        reaction.message.guild.roles.fetch(role.role_given.substring(3, 21)).then(x => guild_member.roles.add(x))
+    }
+}
+
+
+
+
+
 function is_in_database_as_message_watch(db, guild_id, id) {
     return Boolean(db.prepare(`SELECT message_id_to_watch FROM '${guild_id}_reaction_roles' WHERE message_id_to_watch='${id}';`).get())
 }
@@ -26,6 +54,7 @@ module.exports = {
     //post        :
     //description :
     messageReactionAdd: async function (reaction, user, db) {
+        /*if (user.bot) return;
         if (reaction.partial) {
             // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
             try {
@@ -45,12 +74,14 @@ module.exports = {
             //reaction.message.guild.roles.find('name',role)
             console.log(role.role_given.substring(3, 21))
             reaction.message.guild.roles.fetch(role.role_given.substring(3, 21)).then(x => guild_member.roles.add(x))
-        }
+        }*/
+        messageReactionAddFunction(reaction, user, db);
     },
     //pre         :
     //post        :
     //description :
     messageReactionRemove: async function (reaction, user, db) {
+        if (user.bot) return;
         if (reaction.partial) {
             // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
             try {

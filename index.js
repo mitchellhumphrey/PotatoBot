@@ -125,7 +125,9 @@ client.on('message', async function (msg) {
       //cmdlog.log(msg,db,command);
       //dblfile.top_status(msg);
     }
-
+    else if (command === "set-status" && developer.developer_check(msg)){
+      developer.setStatus(client, args);
+    }
 
     //COMMANDS START HERE
     else if (command === "vote"){
