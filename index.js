@@ -201,14 +201,14 @@ client.on('message', async function (msg) {
     }
     else if (command === "hlep") {
       cmdlog.log(msg,db,command);
-      let items = ["c:", "oop", ":/", "No Kendall", "I am boot", "beep boop"]
+      let items = ["c:", "oop", ":/", "No Kendall", "I am boot", "beep boop","secret", "Congrats, you get a raisin", ":v",">:V",":c"]
       msg.channel.send(items[Math.floor(Math.random() * items.length)]);
     }
     else if (['now-playing', 'np', 'nowplaying'].includes(command)) {
       cmdlog.log(msg,db,command);
       voice.now_playing(msg, client);
     }
-    else if (command === 'search') {
+    else if (command === 'search' || command === 'wikipedia') {
       cmdlog.log(msg,db,command);
       search.search(msg, args[0]);
     }
